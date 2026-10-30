@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.todo.controller.TodoController"
+      spacing="16.0" styleClass="root">
+
+    <!-- Top App Header -->
+    <HBox alignment="CENTER_LEFT" spacing="16.0" styleClass="app-header">
+        <VBox HBox.hgrow="ALWAYS" spacing="2.0">
+            <Label text="⚡ TaskFlow" styleClass="app-title"/>
+            <Label text="Organize your workflow and accomplish your goals" styleClass="app-subtitle"/>
+        </VBox>
+        <Button fx:id="newTaskButton" text="+ New Task" onAction="#handleNewTask" styleClass="btn-primary"/>
+    </HBox>
+
+    <!-- Main Content Area -->
+    <VBox spacing="16.0" VBox.vgrow="ALWAYS">
+        <padding>
+            <Insets top="4.0" right="24.0" bottom="20.0" left="24.0"/>
+        </padding>
+
+        <!-- Stats Summary Section -->
+        <HBox spacing="16.0" styleClass="stats-container">
+            <!-- Total Card -->
+            <VBox styleClass="stat-card, stat-card-total" HBox.hgrow="ALWAYS" spacing="4.0">
+                <Label text="TOTAL TASKS" styleClass="stat-card-title"/>
+                <Label fx:id="totalTasksLabel" text="0" styleClass="stat-card-value"/>
+            </VBox>
+
+            <!-- Pending Card -->
+            <VBox styleClass="stat-card, stat-card-pending" HBox.hgrow="ALWAYS" spacing="4.0">
+                <Label text="PENDING" styleClass="stat-card-title"/>
+                <Label fx:id="pendingTasksLabel" text="0" styleClass="stat-card-value"/>
+            </VBox>
+
+            <!-- Completed Card -->
+            <VBox styleClass="stat-card, stat-card-completed" HBox.hgrow="ALWAYS" spacing="4.0">
+                <Label text="COMPLETED" styleClass="stat-card-title"/>
+                <Label fx:id="completedTasksLabel" text="0" styleClass="stat-card-value"/>
+            </VBox>
+
+            <!-- Progress Card -->
+            <VBox styleClass="stat-card" HBox.hgrow="ALWAYS" spacing="6.0">
+                <HBox alignment="CENTER_LEFT">
+                    <Label text="PROGRESS" styleClass="stat-card-title" HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="progressPercentLabel" text="0%" styleClass="stat-card-title"/>
+                </HBox>
+                <ProgressBar fx:id="completionProgressBar" progress="0.0" maxWidth="Infinity" styleClass="custom-progress-bar"/>
+            </VBox>
+        </HBox>
+
+        <!-- Filters & Search Toolbar -->
+        <HBox spacing="12.0" alignment="CENTER_LEFT" styleClass="toolbar-container">
+            <!-- Search Field -->
+            <TextField fx:id="searchField" promptText="🔍 Search tasks by title or details..."
+                       HBox.hgrow="ALWAYS" styleClass="search-field"/>
+
+            <!-- Status Filter Toggle Buttons -->
+            <HBox styleClass="segment-button-group">
+                <ToggleButton fx:id="filterAllBtn" text="All" selected="true" styleClass="segment-button"/>
+                <ToggleButton fx:id="filterActiveBtn" text="Pending" styleClass="segment-button"/>
+                <ToggleButton fx:id="filterCompletedBtn" text="Completed" styleClass="segment-button"/>
+            </HBox>
+
+            <!-- Priority Dropdown -->
+            <ComboBox fx:id="priorityFilterBox" promptText="Priority" styleClass="custom-combo-box"/>
+
+            <!-- Sort By Dropdown -->
+            <ComboBox fx:id="sortBox" promptText="Sort By" styleClass="custom-combo-box"/>
+        </HBox>
+
+        <!-- Task List StackPane (List + Empty State) -->
+        <StackPane VBox.vgrow="ALWAYS">
+            <ListView fx:id="todoListView" styleClass="task-list-view" VBox.vgrow="ALWAYS"/>
+
+            <!-- Empty State Placeholder -->
+            <VBox fx:id="emptyStateBox" alignment="CENTER" spacing="12.0" visible="false" mouseTransparent="true">
+                <Label text="📋" style="-fx-font-size: 42px;"/>
+                <Label text="No tasks found" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #94a3b8;"/>
+                <Label text="Try adjusting your search or filters, or add a new task." style="-fx-font-size: 13px; -fx-text-fill: #64748b;"/>
+            </VBox>
+        </StackPane>
+    </VBox>
+</VBox>

@@ -1,0 +1,39 @@
+# Docker environment to build GluonFX / GraalVM Android Native Apps on macOS
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV GRAALVM_VERSION=22.1.0.1-Final
+ENV GRAALVM_HOME=/opt/graalvm-svm-java17-linux-gluon-${GRAALVM_VERSION}
+ENV JAVA_HOME=${GRAALVM_HOME}
+ENV PATH=${GRAALVM_HOME}/bin:${PATH}
+
+# 1. Install prerequisites and Linux C libraries required by Substrate
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    wget \
+    unzip \
+    git \
+    build-essential \
+    libasound2-dev \
+    libavcodec-dev \
+    libavformat-dev \
+    libavutil-dev \
+    libgl-dev \
+    libgtk-3-dev \
+    libpango1.0-dev \
+    libxtst-dev \
+    maven \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# 2. Download and install Gluon GraalVM distribution for Linux x86_64
+RUN mkdir -p /opt && \
+    curl -fL -o /tmp/graalvm.zip "https://github.com/gluonhq/graal/releases/download/gluon-${GRAALVM_VERSION}/graalvm-svm-java17-linux-gluon-${GRAALVM_VERSION}.zip" && \
+    unzip -q /tmp/graalvm.zip -d /opt && \
+    rm /tmp/graalvm.zip && \
+    chmod +x ${GRAALVM_HOME}/bin/*
+
+WORKDIR /workspace
+
+# By default, trigger the Android build and package steps
+CMD ["mvn", "-B", "-Pandroid", "gluonfx:build", "gluonfx:package"]
