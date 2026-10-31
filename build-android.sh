@@ -40,6 +40,12 @@ fi
 echo "📦 Step 1: Building Linux GraalVM Builder Image..."
 docker build -t taskflow-gluon-builder -f Dockerfile.android .
 
+# Ensure Substrate 0.0.64-SNAPSHOT is installed locally for volume mount
+if [ ! -d "$HOME/.m2/repository/com/gluonhq/substrate/0.0.64-SNAPSHOT" ]; then
+    echo "📦 Substrate 0.0.64-SNAPSHOT not found in ~/.m2. Installing..."
+    bash "$SCRIPT_DIR/install-substrate.sh" || true
+fi
+
 echo "⚙️ Step 2: Running Ahead-of-Time Native Android Compilation..."
 docker run --rm \
     -v "$SCRIPT_DIR":/workspace \

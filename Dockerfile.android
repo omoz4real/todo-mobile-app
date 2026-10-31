@@ -33,6 +33,13 @@ RUN mkdir -p /opt && \
     rm /tmp/graalvm.zip && \
     chmod +x ${GRAALVM_HOME}/bin/*
 
+# 3. Clone and install Johan Vos's Substrate (2024-july) to local Maven cache
+RUN git clone -b 2024-july --depth 1 https://github.com/johanvos/substrate.git /tmp/substrate && \
+    cd /tmp/substrate && \
+    chmod +x gradlew && \
+    ./gradlew publishToMavenLocal -x test -x javadoc && \
+    rm -rf /tmp/substrate
+
 WORKDIR /workspace
 
 # By default, trigger the Android build and package steps

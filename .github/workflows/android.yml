@@ -26,13 +26,42 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libasound2-dev libavcodec-dev libavformat-dev libavutil-dev libgl-dev libgtk-3-dev libpango1.0-dev libxtst-dev
 
+      - name: Checkout Johan Vos Substrate (2024-july)
+        uses: actions/checkout@v4
+        with:
+          repository: johanvos/substrate
+          ref: 2024-july
+          path: substrate-src
+
+      - name: Build and Install Custom Gluon Substrate to Local Maven Cache
+        run: |
+          cd substrate-src
+          # Use pre-installed Java 17/21 for Gradle daemon execution if available to match Gradle 8.8
+          if [ -n "$JAVA_HOME_17_X64" ] && [ -d "$JAVA_HOME_17_X64" ]; then
+            export JAVA_HOME="$JAVA_HOME_17_X64"
+            export PATH="$JAVA_HOME/bin:$PATH"
+          elif [ -n "$JAVA_HOME_21_X64" ] && [ -d "$JAVA_HOME_21_X64" ]; then
+            export JAVA_HOME="$JAVA_HOME_21_X64"
+            export PATH="$JAVA_HOME/bin:$PATH"
+          fi
+          chmod +x gradlew
+          ./gradlew publishToMavenLocal -x test -x javadoc
+          cd ..
+          rm -rf substrate-src
+
       - name: Compile and Package Android APK with Gluon
         run: mvn -B -Pandroid gluonfx:build gluonfx:package
+
+      - name: Dump GluonFX Logs on Failure
+        if: failure()
+        run: |
+          echo "=== Printing GluonFX Process and GVM Logs ==="
+          find target/gluonfx -type f -name "*.log" -exec echo "=== {} ===" \; -exec cat {} \; || true
 
       - name: Stage Android APK Artifact
         run: |
           mkdir -p dist
-          cp target/gluonfx/aarch64-android/gvm/*.apk dist/ || true
+          find target/gluonfx -name "*.apk" -exec cp {} dist/ \; || true
           ls -la dist/
 
       - name: Upload Android APK
